@@ -2,7 +2,13 @@ import { SMTPClient } from "https://deno.land/x/denomailer@1.4.0/mod.ts";
 import { Attachment } from "https://deno.land/x/denomailer@1.4.0/config/mail/attachments.ts";
 // import { select } from 'https://deno.land/x/inquirer/mod.ts'; //套件不相容 deno 1.26
 // import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
-import figlet from "https://x.nest.land/deno-figlet@0.0.5/mod.js";
+import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
+
+let httpRequests = 0;
+addEventListener(
+  "httpRequestEvent",
+  () => console.log("Total requests", ++httpRequests),
+);
 /** Title */
 const myAwesomeFiglet = await figlet("Send Mail CLI");
 console.log(`%c${myAwesomeFiglet}`, "color:gold;");
@@ -15,11 +21,16 @@ console.log(`
 2) 夾帶檔案
 3) 使用 eml 檔案
 `);
-const mailType = prompt("選擇你要的打信類型 📧", "1");
-if (![1, 2, 3].includes(parseInt(mailType))) {
-  alert("%cOpps! your input number is out of range.", "color:red");
+let mailType = prompt('選擇你要的打信類型 📧(不輸入預設為 "1")');
+if (mailType === null || ![1, 2, 3].includes(parseInt(mailType))) {
+  console.log(
+    "%cOpps! your input number is out of range.\nusing 1 for default value.",
+    "color: red",
+  );
+  mailType = "1"; // set default is 1.
 }
-console.log(mailType);
+
+prepareMailSet(mailType);
 Deno.exit();
 /** targetIP 放到 hostname */
 const client = new SMTPClient({
@@ -66,4 +77,8 @@ try {
   console.log("here");
   console.log(Object.keys(error));
   console.log("%s:: %s", error.name, error.code);
+}
+
+async function prepareMailSet(mailType: string): Promise<void> {
+  console.log("111:", mailType);
 }

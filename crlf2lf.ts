@@ -1,11 +1,6 @@
 const IGNORED_DIRECTORIES = new Set([
   ".git",
-  ".gitignore",
-  ".gitignore",
   ".gitlab",
-  ".gif",
-  ".png",
-  ".jpg",
 ]);
 // const tstring = ".env";
 // let re = /.*/i;
@@ -28,9 +23,10 @@ async function getFilesList(
       );
       foundFiles.push(...nestedFiles);
     } else {
-      const re = /^.* || *.gif || *.png || *.jpg/g;
+      // ignore binary file.
+      const re = /(\.jpg$)|(\.png$)|(\.gif$)/i;
       if (re.test(fileOrFolder.name)) {
-        console.log("1111:", fileOrFolder.name)
+        // console.log("1111:", fileOrFolder.name)
         continue;
       }
       // We found a file, so store it.
@@ -42,8 +38,7 @@ async function getFilesList(
 
 // const files = await getFilesList(Deno.cwd());
 const files = await getFilesList("/snmsqr");
-// console.table(files);
-
+console.table(files);
 for (const file of files) {
   const data = await Deno.readFile(file);
   console.log(file);

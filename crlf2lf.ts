@@ -1,3 +1,5 @@
+alert("Make sure you know whcih working directory you're in.");
+prompt("Enter directory name whcih you want to...")
 const IGNORED_DIRECTORIES = new Set([
   ".git",
   ".gitlab",

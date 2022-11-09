@@ -39,24 +39,19 @@ const clientOptions = {
 
 // 提示使用者打信種類
 console.log(`
-1) 純文字信件
-2) 夾帶檔案
-3) 使用 eml 檔案
+1) ✨ Text
+2) ✨ With attachments
+3) ✨ By eml
 `);
 
-let mailType = prompt('選擇你要的打信類型 📧 (不輸入預設為 "1", Ctrl + c = cancel)' + "\n >");
+let mailType = prompt(
+  "🪧 select an option above.  📧 (default = 1, Ctrl + c = cancel)" + "\n >",
+);
 
 // Exit program when user don't wanna continue.
 if (mailType === null) {
+  alert("You didn't selected any one.");
   Deno.exit();
-}
-
-if (![1, 2, 3].includes(parseInt(mailType))) {
-  console.log(
-    "%cOpps! your input number is out of range.\nusing 1 for default value.",
-    "color: red",
-  );
-  mailType = "1"; // set default is 1.
 }
 
 enum mailTypes {
@@ -65,19 +60,26 @@ enum mailTypes {
   TextWithBlob = "3",
 }
 
-prepareMailSet(mailType);
+if (!Object.values(mailTypes).includes(mailType as mailTypes)) {
+  console.log(
+    "%cOpps! your input number is out of range.",
+    "color: red",
+  );
+  mailType = "1"; // set default is 1.
+}
 
-async function prepareMailSet(mailType: string): Promise<void> {
+/** 依照用戶輸入打信 */
+prepareMailSetThenSend(mailType);
+
+async function prepareMailSetThenSend(mailType: string): Promise<void> {
   console.log(`%c 發信類型:${mailType}`, "color:red");
   console.log(`%c 打信IP:${targetIP}`, "color:red");
   const config: SendConfig = {
     from: "weitingshih@softnext.com.tw",
     to: [
       "weitingshih@softnext.com.tw",
-      "weitingshih@softnext.com.tw",
     ],
     cc: [
-      "weitingshih@softnext.com.tw",
       "weitingshih@softnext.com.tw",
     ],
     // bcc: ["weitingshih@rd01.softnext.com.tw", "weitingshih@rd01.softnext.com.tw"],
@@ -90,7 +92,7 @@ async function prepareMailSet(mailType: string): Promise<void> {
   switch (mailType) {
     case mailTypes.Text: {
       // do send text mail.
-      send(clientOptions, config);
+      await send(clientOptions, config);
       break;
     }
     case mailTypes.TextWithAttachment: {
@@ -101,25 +103,33 @@ async function prepareMailSet(mailType: string): Promise<void> {
         content: "1234",
       };
       config.attachments = [textAttachment];
-      send(clientOptions, config);
+      await send(clientOptions, config);
       break;
     }
     default:
+      console.log("Nothing to do.");
       break;
   }
 }
 
 /** 發送信件 */
-async function send(options: ClientOptions, config: SendConfig) {
+async function send(
+  options: ClientOptions,
+  config: SendConfig,
+): Promise<number> {
   // init smtp clint
   const client = new SMTPClient(options);
+  let result = 0;
   try {
     await client.send(config);
     await client.close();
     console.log("mail has been sended");
+    result = 1;
   } catch (error) {
-    console.log("here");
+    console.log("Opps!\n");
     console.log(Object.keys(error));
     console.log("%s:: %s", error.name, error.code);
+    result = -1;
   }
+  return result;
 }

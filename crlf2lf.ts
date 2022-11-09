@@ -1,14 +1,10 @@
 alert("Make sure you know whcih working directory you're in.");
-prompt("Enter directory name whcih you want to...")
+prompt("Enter directory name whcih you want to...");
 const IGNORED_DIRECTORIES = new Set([
   ".git",
   ".gitlab",
 ]);
-// const tstring = ".env";
-// let re = /.*/i;
-// let found = re.test(tstring);
-// console.log(found)
-// Deno.exit();
+
 async function getFilesList(
   directory: string,
 ): Promise<string[]> {

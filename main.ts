@@ -8,13 +8,12 @@ import { Attachment } from "https://deno.land/x/denomailer@1.4.0/config/mail/att
 // import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
 import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
 
-let httpRequests = 0;
 addEventListener(
-  "httpRequestEvent",
-  () => console.log("Total requests", ++httpRequests),
+  "sendMail",
+  () => console.log("Total requests"),
 );
 
-dispatchEvent(new Event("httpRequestEvent"));
+dispatchEvent(new Event("sendMail"));
 // Deno.exit()
 /** Title */
 const myAwesomeFiglet = await figlet("Send Mail CLI");
@@ -37,6 +36,25 @@ const clientOptions = {
   },
 };
 
+// from, to, cc
+const fromWho = prompt(
+  "❓ Who wanna send mail. (e-mail)\n",
+  "weitingshih@softnext.com.tw",
+);
+const toWho = prompt(
+  "❓ Who will recive this mail. (e-mail)\n",
+  "weitingshih@softnext.com.tw",
+);
+const ask4ccWho = prompt(
+  "❓ Do you want to cc someone? (y = yes, n = no)\n",
+  "n",
+);
+
+if (!fromWho || !toWho) {
+  alert("Sender or reciver address can not be empty.\n");
+  Deno.exit();
+}
+
 // 提示使用者打信種類
 console.log(`
 1) ✨ Text
@@ -44,13 +62,14 @@ console.log(`
 3) ✨ By eml
 `);
 
-let mailType = prompt(
-  "🪧 select an option above.  📧 (default = 1, Ctrl + c = cancel)" + "\n >",
+const mailType = prompt(
+  "🪧 select an option which show above.  📧 (default = 1, Ctrl + c = cancel)" +
+    "\n >",
 );
 
 // Exit program when user don't wanna continue.
 if (mailType === null) {
-  alert("You didn't selected any one.");
+  alert("You didn't chose any one.");
   Deno.exit();
 }
 
@@ -60,12 +79,13 @@ enum mailTypes {
   TextWithBlob = "3",
 }
 
+// validate mailType
 if (!Object.values(mailTypes).includes(mailType as mailTypes)) {
   console.log(
     "%cOpps! your input number is out of range.",
     "color: red",
   );
-  mailType = "1"; // set default is 1.
+  Deno.exit();
 }
 
 /** 依照用戶輸入打信 */
@@ -126,9 +146,7 @@ async function send(
     console.log("mail has been sended");
     result = 1;
   } catch (error) {
-    console.log("Opps!\n");
-    console.log(Object.keys(error));
-    console.log("%s:: %s", error.name, error.code);
+    console.log(`Reason: ${error.name}`);
     result = -1;
   }
   return result;

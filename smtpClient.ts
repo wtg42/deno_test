@@ -4,17 +4,19 @@ import {
   SMTPClient,
 } from "https://deno.land/x/denomailer@1.4.0/mod.ts";
 import { Attachment } from "https://deno.land/x/denomailer@1.4.0/config/mail/attachments.ts";
-// import { select } from 'https://deno.land/x/inquirer/mod.ts'; //套件不相容 deno 1.26
-// import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
 import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
+import { mailList } from "https://deno.land/x/denomailer@1.4.0/config/mail/email.ts";
 
-addEventListener(
-  "sendMail",
-  () => console.log("Total requests"),
-);
+// 使用者輸入
+type userOptions = {
+  from?: string,
+  to?: string[],
+  cc?: string[],
+  bcc?: string[],
+}
 
-dispatchEvent(new Event("sendMail"));
-// Deno.exit()
+const userSetting: userOptions = {}
+
 /** Title */
 const myAwesomeFiglet = await figlet("Send Mail CLI");
 console.log(`%c${myAwesomeFiglet}`, "color:gold;");
@@ -36,23 +38,41 @@ const clientOptions = {
   },
 };
 
-// from, to, cc
-const fromWho = prompt(
-  "❓ Who wanna send mail. (e-mail)\n",
+/** 問使用者 from, to, cc */
+userSetting.from = prompt(
+  "❓ Who wanna send mail. (e-mail)",
   "weitingshih@softnext.com.tw",
-);
+)!;
+
 const toWho = prompt(
-  "❓ Who will recive this mail. (e-mail)\n",
+  "❓ Who will recive this mail? ([each e-mail be separated with comma(,)] or leave with empty)",
   "weitingshih@softnext.com.tw",
-);
-const ask4ccWho = prompt(
-  "❓ Do you want to cc someone? (y = yes, n = no)\n",
-  "n",
 );
 
-if (!fromWho || !toWho) {
+if (toWho !== null) {
+  userSetting.to = toWho.split(",").filter((el) => el.trim().length > 0);
+}
+
+// 寄信人和收信人不能沒有值
+if (typeof userSetting.from === 'undefined' || typeof userSetting.to === 'undefined') {
   alert("Sender or reciver address can not be empty.\n");
   Deno.exit();
+}
+
+const ccWho = prompt(
+  "❓ Do you want to cc someone? ([each e-mail be separated with comma(,)] or leave with empty)",
+);
+
+if (ccWho !== null) {
+  userSetting.cc = ccWho.split(",").filter((el) => el.trim().length > 0);
+}
+
+const bccWho = prompt(
+  "❓ Do you want to bcc someone? ([each e-mail be separated with comma(,)] or leave with empty)",
+);
+
+if (bccWho !== null) {
+  userSetting.bcc = bccWho.split(",").filter((el) => el.trim().length > 0);
 }
 
 // 提示使用者打信種類
@@ -91,22 +111,26 @@ if (!Object.values(mailTypes).includes(mailType as mailTypes)) {
 /** 依照用戶輸入打信 */
 prepareMailSetThenSend(mailType);
 
+// --------------------
+
 async function prepareMailSetThenSend(mailType: string): Promise<void> {
   console.log(`%c 發信類型:${mailType}`, "color:red");
   console.log(`%c 打信IP:${targetIP}`, "color:red");
   const config: SendConfig = {
-    from: "weitingshih@softnext.com.tw",
-    to: [
-      "weitingshih@softnext.com.tw",
-    ],
-    cc: [
-      "weitingshih@softnext.com.tw",
-    ],
-    // bcc: ["weitingshih@rd01.softnext.com.tw", "weitingshih@rd01.softnext.com.tw"],
+    from: userSetting.from!,
+    to: userSetting.to!,
+    cc: (userSetting.cc && userSetting.cc.length > 0) ? userSetting.cc as mailList : undefined,
+    bcc: (userSetting.bcc && userSetting.bcc.length > 0) ? userSetting.bcc as mailList : undefined,
     subject: "1234",
-    content: "test",
+    content: "auto",
     html: "<p>...</p>",
-    // attachments: [textAttachment],
+    attachments: [
+      <Attachment> {
+        filename: "attachment_file",
+        content: await Deno.readFile("1234.txt"),
+        encoding: "binary",
+      },
+    ],
   };
 
   switch (mailType) {

@@ -2,10 +2,10 @@ import {
   ClientOptions,
   SendConfig,
   SMTPClient,
-} from "https://deno.land/x/denomailer@1.4.0/mod.ts";
-import { Attachment } from "https://deno.land/x/denomailer@1.4.0/config/mail/attachments.ts";
+} from "https://deno.land/x/denomailer@1.5.0/mod.ts";
+import { Attachment } from "https://deno.land/x/denomailer@1.5.0/config/mail/attachments.ts";
 import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
-import { mailList } from "https://deno.land/x/denomailer@1.4.0/config/mail/email.ts";
+import { mailList } from "https://deno.land/x/denomailer@1.5.0/config/mail/email.ts";
 
 // 使用者輸入
 type userOptions = {
@@ -54,7 +54,10 @@ if (toWho !== null) {
 }
 
 // 寄信人和收信人不能沒有值
-if (typeof userSetting.from === 'undefined' || typeof userSetting.to === 'undefined') {
+if (
+  typeof userSetting.from === "undefined" ||
+  typeof userSetting.to === "undefined"
+) {
   alert("Sender or reciver address can not be empty.\n");
   Deno.exit();
 }
@@ -119,8 +122,12 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
   const config: SendConfig = {
     from: userSetting.from!,
     to: userSetting.to!,
-    cc: (userSetting.cc && userSetting.cc.length > 0) ? userSetting.cc as mailList : undefined,
-    bcc: (userSetting.bcc && userSetting.bcc.length > 0) ? userSetting.bcc as mailList : undefined,
+    cc: (userSetting.cc && userSetting.cc.length > 0)
+      ? userSetting.cc as mailList
+      : undefined,
+    bcc: (userSetting.bcc && userSetting.bcc.length > 0)
+      ? userSetting.bcc as mailList
+      : undefined,
     subject: "1234",
     content: "auto",
     html: "<p>...</p>",

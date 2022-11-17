@@ -9,13 +9,13 @@ import { mailList } from "https://deno.land/x/denomailer@1.5.0/config/mail/email
 
 // 使用者輸入
 type userOptions = {
-  from?: string,
-  to?: string[],
-  cc?: string[],
-  bcc?: string[],
-}
+  from?: string;
+  to?: string[];
+  cc?: string[];
+  bcc?: string[];
+};
 
-const userSetting: userOptions = {}
+const userSetting: userOptions = {};
 
 /** Title */
 const myAwesomeFiglet = await figlet("Send Mail CLI");
@@ -45,7 +45,7 @@ userSetting.from = prompt(
 )!;
 
 const toWho = prompt(
-  "❓ Who will recive this mail? ([each e-mail be separated with comma(,)] or leave with empty)",
+  "❓ Who will recive this mail? ([each e-mail is separated with comma(,)] or leave with empty)",
   "weitingshih@softnext.com.tw",
 );
 
@@ -78,12 +78,20 @@ if (bccWho !== null) {
   userSetting.bcc = bccWho.split(",").filter((el) => el.trim().length > 0);
 }
 
+// 轉換使用者打信類型
+enum MailTypes {
+  Text = "1",
+  TextWithAttachment = "2",
+  TextWithBlob = "3",
+}
+
 // 提示使用者打信種類
-console.log(`
-  1) ✨ Text
-  2) ✨ With attachments
-  3) ✨ By eml
-  `);
+for (const key in MailTypes) {
+  if (Object.prototype.hasOwnProperty.call(MailTypes, key)) {
+    const value = Object.values(MailTypes)[Object.keys(MailTypes).indexOf(key as unknown as MailTypes)]
+    console.log(` ${value}) ✨ ${key}`)
+  }
+}
 
 const mailType = prompt(
   "🪧 select an option which show above.  📧 (default = 1, Ctrl + c = cancel)" +
@@ -96,14 +104,8 @@ if (mailType === null) {
   Deno.exit();
 }
 
-enum mailTypes {
-  Text = "1",
-  TextWithAttachment = "2",
-  TextWithBlob = "3",
-}
-
 // validate mailType
-if (!Object.values(mailTypes).includes(mailType as mailTypes)) {
+if (!Object.values(MailTypes).includes(mailType as MailTypes)) {
   console.log(
     "%cOpps! your input number is out of range.",
     "color: red",
@@ -114,10 +116,23 @@ if (!Object.values(mailTypes).includes(mailType as mailTypes)) {
 /** 依照用戶輸入打信 */
 prepareMailSetThenSend(mailType);
 
+// We wait here for sending mail is done.
+console.log("Mail is sending...");
+
 // --------------------
 
+/**
+ * 異步發信
+ */
 async function prepareMailSetThenSend(mailType: string): Promise<void> {
-  console.log(`%c 發信類型:${mailType}`, "color:red");
+  console.log(
+    `%c 發信類型:${
+      Object.keys(
+        MailTypes,
+      )[Object.values(MailTypes).indexOf(mailType as MailTypes)]
+    }`,
+    "color:red",
+  );
   console.log(`%c 打信IP:${targetIP}`, "color:red");
   const config: SendConfig = {
     from: userSetting.from!,
@@ -128,33 +143,38 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
     bcc: (userSetting.bcc && userSetting.bcc.length > 0)
       ? userSetting.bcc as mailList
       : undefined,
-    subject: "1234",
+    subject: "From deno smtp app",
     content: "auto",
-    html: "<p>...</p>",
-    attachments: [
-      <Attachment> {
-        filename: "attachment_file",
-        content: await Deno.readFile("1234.txt"),
-        encoding: "binary",
-      },
-    ],
+    html: "<p>WTF</p>",
   };
 
   switch (mailType) {
-    case mailTypes.Text: {
+    case MailTypes.Text: {
       // do send text mail.
-      await send(clientOptions, config);
+      send(clientOptions, config);
       break;
     }
-    case mailTypes.TextWithAttachment: {
+    case MailTypes.TextWithAttachment: {
+      const filename = prompt('Attach a text file to mail?')
       const textAttachment: Attachment = {
         contentType: "text/plain",
-        filename: "text.txt",
+        filename: "1234.txt",
         encoding: "text",
         content: "1234",
       };
       config.attachments = [textAttachment];
-      await send(clientOptions, config);
+      send(clientOptions, config);
+      break;
+    }
+    case MailTypes.TextWithBlob: {
+      config.attachments = [
+        <Attachment> {
+          filename: "attachment_file.zip",
+          content: await Deno.readFile("1234.zip"),
+          encoding: "binary",
+        },
+      ];
+      send(clientOptions, config)
       break;
     }
     default:
@@ -174,7 +194,7 @@ async function send(
   try {
     await client.send(config);
     await client.close();
-    console.log("mail has been sended");
+    console.log("Done! mail is sended");
     result = 1;
   } catch (error) {
     console.log(`Reason: ${error.name}`);

@@ -149,16 +149,18 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
   };
 
   switch (mailType) {
+    // 純文字
     case MailTypes.Text: {
       // do send text mail.
       send(clientOptions, config);
       break;
     }
+    // 文字夾檔
     case MailTypes.TextWithAttachment: {
-      const filename = prompt('Attach a text file to mail?')
+      const filename = prompt('Attachment file path: (leave with empty)')
       const textAttachment: Attachment = {
         contentType: "text/plain",
-        filename: "1234.txt",
+        filename: (filename) ?? "1234.txt",
         encoding: "text",
         content: "1234",
       };

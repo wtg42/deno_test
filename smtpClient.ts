@@ -88,8 +88,10 @@ enum MailTypes {
 // 提示使用者打信種類
 for (const key in MailTypes) {
   if (Object.prototype.hasOwnProperty.call(MailTypes, key)) {
-    const value = Object.values(MailTypes)[Object.keys(MailTypes).indexOf(key as unknown as MailTypes)]
-    console.log(` ${value}) ✨ ${key}`)
+    const value = Object.values(
+      MailTypes,
+    )[Object.keys(MailTypes).indexOf(key as unknown as MailTypes)];
+    console.log(` ${value}) ✨ ${key}`);
   }
 }
 
@@ -144,7 +146,7 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
       ? userSetting.bcc as mailList
       : undefined,
     subject: "From deno smtp app",
-    content: "auto",
+    content: "WTF",
     html: "<p>WTF</p>",
   };
 
@@ -157,7 +159,9 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
     }
     // 文字夾檔
     case MailTypes.TextWithAttachment: {
-      const filename = prompt('Attachment file path: (leave with empty)')
+      const filename = prompt(
+        "Attachment file path: (leave with empty will use default value)\n>",
+      );
       const textAttachment: Attachment = {
         contentType: "text/plain",
         filename: (filename) ?? "1234.txt",
@@ -169,14 +173,19 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
       break;
     }
     case MailTypes.TextWithBlob: {
+      let filename = prompt(
+        "Attachment file path: (leave with empty will use default value)\n>",
+      );
+      // if null, then set value is 'a1.eml'
+      filename = filename ?? "a1.eml";
       config.attachments = [
         <Attachment> {
           filename: "attachment_file.zip",
-          content: await Deno.readFile("1234.zip"),
+          content: await Deno.readFile(filename),
           encoding: "binary",
         },
       ];
-      send(clientOptions, config)
+      send(clientOptions, config);
       break;
     }
     default:

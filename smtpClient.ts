@@ -2,10 +2,10 @@ import {
   ClientOptions,
   SendConfig,
   SMTPClient,
-} from "https://deno.land/x/denomailer@1.5.0/mod.ts";
-import { Attachment } from "https://deno.land/x/denomailer@1.5.0/config/mail/attachments.ts";
+} from "https://deno.land/x/denomailer@1.5.2/mod.ts";
+import { Attachment } from "https://deno.land/x/denomailer@1.5.2/config/mail/attachments.ts";
 import figlet from "https://dzjd3wnuerwiybhjc6w4aqtpnm46ble4dcfbb6jn7w3upjcmpraa.arweave.net/HlI92bQkbIwE6RetwEJvazngrJwYihD5Lf23R6RMfEA/mod.js";
-import { mailList } from "https://deno.land/x/denomailer@1.5.0/config/mail/email.ts";
+import { mailList } from "https://deno.land/x/denomailer@1.5.2/config/mail/email.ts";
 
 // 使用者輸入
 type userOptions = {
@@ -40,7 +40,7 @@ const clientOptions = {
 
 /** 問使用者 from, to, cc */
 userSetting.from = prompt(
-  "❓ Who wanna send mail. (e-mail)",
+  "❓ Who wanna send mail? (e-mail)",
   "weitingshih@softnext.com.tw",
 )!;
 
@@ -154,7 +154,7 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
     // 純文字
     case MailTypes.Text: {
       // do send text mail.
-      send(clientOptions, config);
+      await send(clientOptions, config);
       break;
     }
     // 文字夾檔
@@ -169,7 +169,7 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
         content: "1234",
       };
       config.attachments = [textAttachment];
-      send(clientOptions, config);
+      await send(clientOptions, config);
       break;
     }
     case MailTypes.TextWithBlob: {
@@ -185,7 +185,7 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
           encoding: "binary",
         },
       ];
-      send(clientOptions, config);
+      await send(clientOptions, config);
       break;
     }
     default:

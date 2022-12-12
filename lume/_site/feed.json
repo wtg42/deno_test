@@ -1,0 +1,16 @@
+{
+  "version": "https://jsonfeed.org/version/1",
+  "title": "Blog name",
+  "home_page_url": "http://localhost:3000/",
+  "feed_url": "http://localhost:3000/feed.json",
+  "description": "General description of the blog",
+  "items": [
+    {
+      "id": "http://localhost:3000/posts/my-first-post/",
+      "url": "http://localhost:3000/posts/my-first-post/",
+      "title": "Static sites with Lume + Deno Deploy",
+      "content_html": "<p>Deno is always a great choice to create dynamic web applications and APIs,\nespecially when it's combined with Deno Deploy to generate responses at the\nedge. ...測試</p>",
+      "date_published": "2022-11-05T08:00:00+08:00"
+    }
+  ]
+}

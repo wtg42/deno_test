@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>Blog name</title>
+	<subtitle>General description of the blog</subtitle>
+	<link href="http://localhost:3000/feed.xml" rel="self"/>
+	<link href="http://localhost:3000/"/>
+	
+	<updated>2022-12-11T14:03:07+08:00</updated>
+	<id>http://localhost:3000/</id>
+	<entry>
+		<title>Static sites with Lume + Deno Deploy</title>
+		<link href="http://localhost:3000/posts/my-first-post/"/>
+		<updated>2022-11-05T08:00:00+08:00</updated>
+		<id>http://localhost:3000/posts/my-first-post/</id>
+		
+		<content type="html">&lt;p&gt;Deno is always a great choice to create dynamic web applications and APIs,
+especially when it&#39;s combined with Deno Deploy to generate responses at the
+edge. ...測試&lt;/p&gt;</content>
+	</entry>
+</feed>

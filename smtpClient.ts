@@ -177,10 +177,10 @@ async function prepareMailSetThenSend(mailType: string): Promise<void> {
         "Attachment file path: (leave with empty will use default value)\n>",
       );
       // if null, then set value is 'a1.eml'
-      filename = filename ?? "a1.eml";
+      filename = filename ?? "1234.zip";
       config.attachments = [
         <Attachment> {
-          filename: "attachment_file.zip",
+          filename: filename,
           content: await Deno.readFile(filename),
           encoding: "binary",
         },
